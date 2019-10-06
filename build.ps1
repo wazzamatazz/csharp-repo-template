@@ -42,7 +42,7 @@ param(
 
 Set-StrictMode -Version 2
 $ErrorActionPreference = 'Stop'
-$SolutionFile = "$PSScriptRoot/SOLUTION_FILE.sln"
+$SolutionFile = "$PSScriptRoot/RENAME-ME.sln"
 $Artifacts = "$PSScriptRoot/artifacts"
 
 if ($Help) {
