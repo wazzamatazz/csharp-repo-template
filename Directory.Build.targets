@@ -6,6 +6,11 @@
   </PropertyGroup>
   <Import Project="$(ParentProject)" Condition=" '$(ParentProject)' != '' " /> 
 
+  <!-- Opt in to FxCop and SourceLink package references by default. -->
+  <PropertyGroup>
+    <IncludeDevelopmentPackages Condition=" '$(IncludeDevelopmentPackages)' == '' ">true</IncludeDevelopmentPackages>
+  </PropertyGroup>
+
   <!-- SourceLink settings -->
   <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

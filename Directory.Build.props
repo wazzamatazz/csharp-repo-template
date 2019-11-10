@@ -11,7 +11,6 @@
     <PackageProjectUrl>https://github.com/wazzamatazz/REPO-NAME</PackageProjectUrl>
     <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\packages\$(Configuration)</PackageOutputPath>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <IncludeDevelopmentPackages Condition=" '$(IncludeDevelopmentPackages)' == '' ">true</IncludeDevelopmentPackages>
   </PropertyGroup>
 
   <Choose>
