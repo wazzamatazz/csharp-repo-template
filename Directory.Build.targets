@@ -14,7 +14,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(IncludeDevelopmentPackages)' == 'true' ">
     <!-- FxCop NuGet Package -->
     <PackageReference Remove="Microsoft.CodeAnalysis.FxCopAnalyzers" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">

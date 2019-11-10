@@ -9,6 +9,7 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <SignOutput>false</SignOutput>
+    <IncludeDevelopmentPackages>false</IncludeDevelopmentPackages>
   </PropertyGroup>
 
 </Project>
