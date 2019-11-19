@@ -61,7 +61,7 @@ if ($Help) {
 . "$PSScriptRoot/build/tools.ps1"
 
 # Set MSBuild verbosity
-$MSBuildArguments += "/v:$Verbosity"
+$MSBuildArguments += "-v:$Verbosity"
 
 # Select targets
 $MSBuildTargets = @()
