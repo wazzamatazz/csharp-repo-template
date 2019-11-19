@@ -17,14 +17,26 @@ Increment the major version and set the pre-release label to "alpha".
 #>
 [CmdletBinding(PositionalBinding = $false, DefaultParameterSetName='Groups')]
 param(
-    [switch]$Major,
+    [switch]
+    $Major,
 
-    [switch]$Minor,
+    [switch]
+    $Minor,
 
-    [switch]$Patch,
+    [switch]
+    $Patch,
 
-    $PreRelease
+    [string]
+    $PreRelease,
+
+    [switch]
+    $Help
 )
+
+if ($Help) {
+    Get-Help $PSCommandPath -Detailed
+    exit 1
+}
 
 $VersionFilePath = "$PSScriptRoot/version.json"
 $Version = Get-Content $VersionFilePath | Out-String | ConvertFrom-Json
