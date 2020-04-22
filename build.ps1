@@ -13,6 +13,8 @@ Specifies if the "Clean" target should be run prior to the "Build" target.
 Produce NuGet packages.
 .PARAMETER Sign
 Sign assemblies and NuGet packages (requires additional configuration not provided by this script).
+.PARAMETER CI
+Sets the MSBuild "ContinuousIntegrationBuild" property to "true".
 .PARAMETER Verbosity
 MSBuild verbosity: q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]
 .PARAMETER MSBuildArguments
@@ -35,6 +37,9 @@ param(
 
     [switch]
     $Sign,
+
+    [switch]
+    $CI,
     
     [string]
     $Verbosity = 'minimal',
@@ -50,7 +55,7 @@ param(
 
 Set-StrictMode -Version 2
 $ErrorActionPreference = 'Stop'
-$SolutionFile = "$PSScriptRoot/RENAME-ME.sln"
+$SolutionFile = "$PSScriptRoot/{{RENAME-ME.sln}}"
 $Artifacts = "$PSScriptRoot/artifacts"
 
 if ($Help) {
@@ -88,21 +93,26 @@ if ($Sign) {
 }
 
 # Configure version numbers to use in build.
-$Version = Get-Content "$PSScriptRoot/build/version.json" | Out-String | ConvertFrom-Json
-$MajorMinorVersion = "$($Version.Major).$($Version.Minor)"
-$MajorMinorPatchVersion = "$($MajorMinorVersion).$($Version.Patch)"
+
+$v = Get-Content "$PSScriptRoot/build/version.json" | Out-String | ConvertFrom-Json
+$MajorMinorVersion = "$($v.Major).$($v.Minor)"
+$MajorMinorPatchVersion = "$($MajorMinorVersion).$($v.Patch)"
 
 $AssemblyVersion = "$($MajorMinorVersion).0.0"
 $FileVersion = "$($MajorMinorPatchVersion).0"
-if ([string]::IsNullOrEmpty($Version.PreRelease)) {
+if ([string]::IsNullOrEmpty($v.PreRelease)) {
     $PackageVersion = $MajorMinorPatchVersion
 } else {
-    $PackageVersion = "$($MajorMinorPatchVersion)-$($Version.PreRelease)"
+    $PackageVersion = "$($MajorMinorPatchVersion)-$($v.PreRelease)"
 }
 
 $MSBuildArguments += "-p:""AssemblyVersion=$($AssemblyVersion)"""
 $MSBuildArguments += "-p:""FileVersion=$($FileVersion)"""
 $MSBuildArguments += "-p:""Version=$($PackageVersion)"""
+
+if ($CI) {
+    $MSBuildArguments += "/p:ContinuousIntegrationBuild=true"
+}
 
 $local:exit_code = $null
 try {

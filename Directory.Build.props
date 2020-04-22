@@ -10,13 +10,13 @@
   <Import Project=".\build\Dependencies.props" Condition="Exists('.\build\Dependencies.props')" />
 
   <PropertyGroup>
-    <Authors>{AUTHORS}</Authors>
-    <Company>{COMPANY_NAME}</Company>
-    <PackageProjectUrl>https://github.com/{GITHUB_USERNAME}/{REPO_NAME}</PackageProjectUrl>
+    <Authors>{{AUTHORS}}</Authors>
+    <Company>{{COMPANY_NAME}}</Company>
+    <PackageProjectUrl>https://github.com/{{GITHUB_USERNAME}}/{{REPO_NAME}}</PackageProjectUrl>
     <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\packages\$(Configuration)</PackageOutputPath>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <NeutralLanguage>en</NeutralLanguage>
-    <CopyrightStartYear>{COPYRIGHT_START_YEAR}</CopyrightStartYear>
+    <CopyrightStartYear>{{COPYRIGHT_START_YEAR}}</CopyrightStartYear>
   </PropertyGroup>
 
   <Choose>
