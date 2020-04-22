@@ -1,1 +1,1 @@
-Source projects go here!
+Source projects belong in this folder!

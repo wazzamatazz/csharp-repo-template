@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <!-- SourceLink settings -->
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(IncludeDevelopmentPackages)' == 'true' ">
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
@@ -22,31 +22,20 @@
   <ItemGroup Condition=" '$(IncludeDevelopmentPackages)' == 'true' ">
     <!-- FxCop NuGet Package -->
     <PackageReference Remove="Microsoft.CodeAnalysis.FxCopAnalyzers" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="$(MicrosoftCodeAnalysisFxCopAnalyzersVersion)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
 
     <!-- SourceLink NuGet Package -->
     <PackageReference Remove="Microsoft.SourceLink.GitHub" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkGitHubVersion)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
-  <!-- Workaround https://github.com/NuGet/Home/issues/7001 -->
-  <Target Name="DisableNuGetDeterministicPackaging" BeforeTargets="GenerateNuspec" AfterTargets="CoreCompile">
-    <PropertyGroup>
-      <Deterministic>false</Deterministic>
-    </PropertyGroup>
-  </Target>
-
-  <!-- Workaround https://github.com/dotnet/cli/issues/11378#issuecomment-499988244 -->
-  <Target Name="WorkaroundNetStandard" AfterTargets="ResolvePackageAssets" Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
-    <ItemGroup>
-      <TransitiveFrameworkReference Remove="NETStandard.Library" />
-    </ItemGroup>
-  </Target>
+  <!-- Extension point to allow Continuous Integration systems to inject their own configuration. -->
+  <Import Project="CI.targets" Condition="Exists('CI.targets')" />
 
 </Project>

@@ -1,3 +1,3 @@
 # csharp-repo-template
 
- Repository template for a C# project
+Repository template for a C# project

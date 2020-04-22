@@ -1,0 +1,27 @@
+<!-- Contains NuGet package versions used throughout the rest of the repository. -->
+
+<Project>
+
+  <!-- CoreFX Packages -->
+  <PropertyGroup>
+  </PropertyGroup>
+  
+  <!-- ASP.NET Core/Microsoft Extension Packages -->
+  <PropertyGroup>
+  </PropertyGroup>
+  
+  <!-- Dev/Test/Benchmark Packages -->
+  <PropertyGroup>
+    <BenchmarkDotNetVersion>0.12.1</BenchmarkDotNetVersion>
+    <MicrosoftCodeAnalysisFxCopAnalyzersVersion>2.9.8</MicrosoftCodeAnalysisFxCopAnalyzersVersion>
+    <MicrosoftNETTestSdkVersion>16.5.0</MicrosoftNETTestSdkVersion>
+    <MicrosoftSourceLinkGitHubVersion>1.0.0</MicrosoftSourceLinkGitHubVersion>
+    <MSTestTestAdapterVersion>2.1.1</MSTestTestAdapterVersion>
+    <MSTestTestFrameworkVersion>2.1.1</MSTestTestFrameworkVersion>
+  </PropertyGroup>
+  
+  <!-- Other Packages -->
+  <PropertyGroup>
+  </PropertyGroup>
+  
+</Project>
