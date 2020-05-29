@@ -32,6 +32,5 @@ The repository is organised as follows:
   - `build.ps1` - PowerShell script to assist with building the projects from the command line.
   - `Directory.Build.props` - Common MSBuild properties and targets (see [here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build) for details).
   - `Directory.Build.targets` - Common MSBuild properties and targets (see [here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build) for details). 
-  - `LICENSE`
   - `README.md`
   - `RENAME-ME.sln` - Empty Visual Studio solution file.
