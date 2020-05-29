@@ -6,7 +6,8 @@
   </PropertyGroup>
   <Import Project="$(ParentProject)" Condition=" '$(ParentProject)' != '' " /> 
 
-  <!-- Opt in to FxCop and SourceLink package references by default. -->
+  <!-- Opt in to FxCop and SourceLink package references by default. Projects in the samples and 
+       tests folders are pre-configured to opt out. -->
   <PropertyGroup>
     <IncludeDevelopmentPackages Condition=" '$(IncludeDevelopmentPackages)' == '' ">true</IncludeDevelopmentPackages>
   </PropertyGroup>
@@ -34,6 +35,15 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+  <!-- Workaround for https://github.com/dotnet/sourcelink/issues/572 - REMOVE ONCE SDK 3.1.300 IS RELEASED -->
+  <PropertyGroup>
+    <TargetFrameworkMonikerAssemblyAttributesPath>$([System.IO.Path]::Combine('$(IntermediateOutputPath)','$(TargetFrameworkMoniker).AssemblyAttributes$(DefaultLanguageSourceExtension)'))</TargetFrameworkMonikerAssemblyAttributesPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>
+  </ItemGroup>
+  <!-- /Workaround -->
 
   <!-- Extension point to allow Continuous Integration systems to inject their own configuration. -->
   <Import Project="CI.targets" Condition="Exists('CI.targets')" />

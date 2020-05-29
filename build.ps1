@@ -9,6 +9,8 @@ This script runs MSBuild on this repository.
 Specify MSBuild configuration: Debug, Release
 .PARAMETER Clean
 Specifies if the "Clean" target should be run prior to the "Build" target.
+.PARAMETER NoBuild
+When specified, "Build" and "Pack" targets will not be run.
 .PARAMETER Pack
 Produce NuGet packages.
 .PARAMETER Sign
@@ -33,6 +35,9 @@ param(
     $Clean,
 
     [switch]
+    $NoBuild,
+
+    [switch]
     $Pack,
 
     [switch]
@@ -55,15 +60,16 @@ param(
 
 Set-StrictMode -Version 2
 $ErrorActionPreference = 'Stop'
-$SolutionFile = "$PSScriptRoot/{{RENAME-ME.sln}}"
-$Artifacts = "$PSScriptRoot/artifacts"
 
 if ($Help) {
     Get-Help $PSCommandPath -Detailed
     exit 1
 }
 
-. "$PSScriptRoot/build/tools.ps1"
+$SolutionFile = (Get-ChildItem -Path "$PSScriptRoot/*.sln" -Force -File | Select-Object -First 1).Name
+$Artifacts = "$PSScriptRoot/artifacts"
+
+. "$PSScriptRoot/build/Tools.ps1"
 
 # Set MSBuild verbosity
 $MSBuildArguments += "-v:$Verbosity"
@@ -73,42 +79,35 @@ $MSBuildTargets = @()
 if ($Clean) {
     $MSBuildTargets += 'Clean'
 }
-$MSBuildTargets += 'Build'
-if ($Pack) {
-    $MSBuildTargets += 'Pack'
+if (-Not $NoBuild) {
+    $MSBuildTargets += 'Build'
+    if ($Pack) {
+        $MSBuildTargets += 'Pack'
+    }
 }
 
 $local:targets = [string]::Join(';',$MSBuildTargets)
 $MSBuildArguments += "-t:""$targets"""
 
-# Set default configuration if required
-if (-not $Configuration) {
-    $Configuration = 'Debug'
+if (-Not $NoBuild) {
+    # Set default configuration if required
+    if (-not $Configuration) {
+        $Configuration = 'Debug'
+    }
+    $MSBuildArguments += "-p:""Configuration=$Configuration"""
+
+    # If the Sign flag is set, add a SignOutput build argument.
+    if ($Sign) {
+        $MSBuildArguments += "-p:""SignOutput=true"""
+    }
+
+    # Configure version numbers to use in build.
+    $Version = . "$PSScriptRoot/build/Get-Version.ps1"
+
+    $MSBuildArguments += "/p:""AssemblyVersion=$($Version.AssemblyVersion)"""
+    $MSBuildArguments += "/p:""FileVersion=$($Version.FileVersion)"""
+    $MSBuildArguments += "/p:""Version=$($Version.PackageVersion)"""
 }
-$MSBuildArguments += "-p:""Configuration=$Configuration"""
-
-# If the Sign flag is set, add a SignOutput build argument.
-if ($Sign) {
-    $MSBuildArguments += "-p:""SignOutput=true"""
-}
-
-# Configure version numbers to use in build.
-
-$v = Get-Content "$PSScriptRoot/build/version.json" | Out-String | ConvertFrom-Json
-$MajorMinorVersion = "$($v.Major).$($v.Minor)"
-$MajorMinorPatchVersion = "$($MajorMinorVersion).$($v.Patch)"
-
-$AssemblyVersion = "$($MajorMinorVersion).0.0"
-$FileVersion = "$($MajorMinorPatchVersion).0"
-if ([string]::IsNullOrEmpty($v.PreRelease)) {
-    $PackageVersion = $MajorMinorPatchVersion
-} else {
-    $PackageVersion = "$($MajorMinorPatchVersion)-$($v.PreRelease)"
-}
-
-$MSBuildArguments += "-p:""AssemblyVersion=$($AssemblyVersion)"""
-$MSBuildArguments += "-p:""FileVersion=$($FileVersion)"""
-$MSBuildArguments += "-p:""Version=$($PackageVersion)"""
 
 if ($CI) {
     $MSBuildArguments += "/p:ContinuousIntegrationBuild=true"
@@ -116,8 +115,8 @@ if ($CI) {
 
 $local:exit_code = $null
 try {
-    # Clear artifacts folder
-    Clear-Artifacts
+    # Uncomment the following line to delete all files from the artifacts folder before building.
+    #Clear-Artifacts
 
     # Run the build
     Run-Build

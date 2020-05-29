@@ -11,9 +11,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{C4C50D71-6AAC-45A9-9257-5D02A42B61DC}"
 	ProjectSection(SolutionItems) = preProject
 		build\Dependencies.props = build\Dependencies.props
-		build\increment-version.ps1 = build\increment-version.ps1
+		build\Get-Version.ps1 = build\Get-Version.ps1
 		build\README.md = build\README.md
-		build\tools.ps1 = build\tools.ps1
+		build\Set-TeamCityParameters.ps1 = build\Set-TeamCityParameters.ps1
+		build\Tools.ps1 = build\Tools.ps1
 		build\version.json = build\version.json
 	EndProjectSection
 EndProject
