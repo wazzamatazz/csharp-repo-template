@@ -26,7 +26,7 @@ Function Run-Build {
     Write-Host "MSBuild arguments: $MSBuildArguments"
     Write-Host
 
-    MSBuild `
+    dotnet msbuild `
         $SolutionFile `
         @MSBuildArguments
 }

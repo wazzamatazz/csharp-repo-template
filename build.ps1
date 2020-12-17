@@ -78,6 +78,7 @@ $MSBuildArguments += "-v:$Verbosity"
 $MSBuildTargets = @()
 if ($Clean) {
     $MSBuildTargets += 'Clean'
+    Clear-Artifacts
 }
 if (-Not $NoBuild) {
     $MSBuildTargets += 'Build'
@@ -104,20 +105,17 @@ if (-Not $NoBuild) {
     # Configure version numbers to use in build.
     $Version = . "$PSScriptRoot/build/Get-Version.ps1"
 
-    $MSBuildArguments += "/p:""AssemblyVersion=$($Version.AssemblyVersion)"""
-    $MSBuildArguments += "/p:""FileVersion=$($Version.FileVersion)"""
-    $MSBuildArguments += "/p:""Version=$($Version.PackageVersion)"""
+    $MSBuildArguments += "-p:""AssemblyVersion=$($Version.AssemblyVersion)"""
+    $MSBuildArguments += "-p:""FileVersion=$($Version.FileVersion)"""
+    $MSBuildArguments += "-p:""Version=$($Version.PackageVersion)"""
 }
 
 if ($CI) {
-    $MSBuildArguments += "/p:ContinuousIntegrationBuild=true"
+    $MSBuildArguments += "-p:ContinuousIntegrationBuild=true"
 }
 
 $local:exit_code = $null
 try {
-    # Uncomment the following line to delete all files from the artifacts folder before building.
-    #Clear-Artifacts
-
     # Run the build
     Run-Build
 }

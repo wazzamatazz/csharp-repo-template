@@ -13,11 +13,11 @@
   <!-- Dev/Test/Benchmark Packages -->
   <PropertyGroup>
     <BenchmarkDotNetVersion>0.12.1</BenchmarkDotNetVersion>
-    <MicrosoftCodeAnalysisFxCopAnalyzersVersion>3.0.0</MicrosoftCodeAnalysisFxCopAnalyzersVersion>
-    <MicrosoftNETTestSdkVersion>16.6.1</MicrosoftNETTestSdkVersion>
+    <MicrosoftCodeAnalysisNetAnalyzersVersion>5.0.1</MicrosoftCodeAnalysisNetAnalyzersVersion>
+    <MicrosoftNETTestSdkVersion>16.8.3</MicrosoftNETTestSdkVersion>
     <MicrosoftSourceLinkGitHubVersion>1.0.0</MicrosoftSourceLinkGitHubVersion>
-    <MSTestTestAdapterVersion>2.1.1</MSTestTestAdapterVersion>
-    <MSTestTestFrameworkVersion>2.1.1</MSTestTestFrameworkVersion>
+    <MSTestTestAdapterVersion>2.1.2</MSTestTestAdapterVersion>
+    <MSTestTestFrameworkVersion>2.1.2</MSTestTestFrameworkVersion>
   </PropertyGroup>
   
   <!-- Other Packages -->
