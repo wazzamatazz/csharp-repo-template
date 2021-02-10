@@ -33,101 +33,20 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 // --build-metadata=<METADATA>
 //   Additional build metadata that will be included in the information version number generated 
 //   for compiled assemblies.
+//
+// --verbose
+//   Enables verbose messages.
 // 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #addin nuget:?package=Cake.Json&version=5.2.0
 #addin nuget:?package=Newtonsoft.Json&version=11.0.2
 
+#load "build/build-state.cake"
+#load "build/build-utilities.cake"
+
 // Get the target that was specified.
 var target = Argument("target", "Test");
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// BUILD STATE TYPE DEFINITION
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-public class BuildData {
-
-    // The solution to build.
-    public string SolutionName { get; set; }
-
-    // The build number.
-    public string BuildNumber { get; set; }
-
-    // The Cake target.
-    public string Target { get; set; }
-
-    // The MSBuild configuration.
-    public string Configuration { get; set; }
-
-    // Specifies if this is a rebuild or an incremental build.
-    public bool Rebuild { get; set; }
-
-    // Specifies if artifacts and bin folders should be cleaned before building.
-    public bool Clean => Rebuild || string.Equals(Target, "Clean", StringComparison.OrdinalIgnoreCase);
-
-    // Specifies if this is a continuous integration build.
-    public bool ContinuousIntegrationBuild { get; set; }
-
-    // Specifies if DLLs and NuGet packages should be signed.
-    public bool SignOutput { get; set; }
-
-    // Specifies if output signing is allowed.
-    public bool CanSignOutput => SignOutput && ContinuousIntegrationBuild;
-
-    // MSBuild AssemblyVersion property value.
-    public string AssemblyVersion { get; set; }
-
-    // MSBuild AssemblyFileVersion property value.
-    public string AssemblyFileVersion { get; set; }
-
-    // MSBuild InformationalVersion property value.
-    public string InformationalVersion { get; set; }
-
-    // MSBuild Version property value.
-    public string PackageVersion { get; set; }
-
-
-    // Adds MSBuild properties from the build data.
-    public void ApplyMSBuildProperties(DotNetCoreMSBuildSettings settings) {
-        // Specify if this is a CI build. 
-        if (ContinuousIntegrationBuild) {
-            settings.Properties["ContinuousIntegrationBuild"] = new List<string> { "True" };
-        }
-
-        // Specify if we are signing DLLs and NuGet packages.
-        if (CanSignOutput) {
-            settings.Properties["SignOutput"] = new List<string> { "True" };
-        }
-
-        // Set version numbers.
-        settings.Properties["AssemblyVersion"] = new List<string> { AssemblyVersion };
-        settings.Properties["AssemblyFileVersion"] = new List<string> { AssemblyFileVersion };
-        settings.Properties["Version"] = new List<string> { PackageVersion };
-        settings.Properties["InformationalVersion"] = new List<string> { InformationalVersion };
-    }
-
-
-    public void Dump() {
-        Console.WriteLine();
-        Console.WriteLine($"Solution Name: {SolutionName}");
-        Console.WriteLine($"Build Number: {BuildNumber}");
-        Console.WriteLine($"Target: {Target}");
-        Console.WriteLine($"Configuration: {Configuration}");
-        Console.WriteLine($"Rebuild: {Rebuild}");
-        Console.WriteLine($"Continous Integration Build: {ContinuousIntegrationBuild}");
-        Console.WriteLine($"Sign Output: {CanSignOutput}");
-        Console.WriteLine();
-        Console.WriteLine($"Informational Version: {InformationalVersion}");
-        Console.WriteLine($"Assembly Version: {AssemblyVersion}");
-        Console.WriteLine($"Assembly File Version: {AssemblyFileVersion}");
-        Console.WriteLine($"Package Version: {PackageVersion}");
-        Console.WriteLine();
-    }
-
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,14 +55,15 @@ public class BuildData {
 
 
 // Constructs the build state object.
-Setup<BuildData>(context => {
-    var data = new BuildData() {
+Setup<BuildState>(context => {
+    var state = new BuildState() {
         SolutionName = Argument("project", DefaultSolutionName),
         Target = target,
         Configuration = Argument("configuration", "Debug"),
         ContinuousIntegrationBuild = HasArgument("ci") || !BuildSystem.IsLocalBuild,
         Rebuild = HasArgument("rebuild"),
-        SignOutput = HasArgument("sign-output")
+        SignOutput = HasArgument("sign-output"),
+        Verbose = HasArgument("verbose")
     };
 
     // Get raw version numbers from JSON.
@@ -161,47 +81,41 @@ Setup<BuildData>(context => {
     var buildMetadata = Argument("build-metadata", "");
     var branch = Argument("branch", "master");
 
-    data.AssemblyVersion = $"{majorVersion}.{minorVersion}.0.0";
-    data.AssemblyFileVersion = $"{majorVersion}.{minorVersion}.{patchVersion}.{buildCounter}";
+    state.AssemblyVersion = $"{majorVersion}.{minorVersion}.0.0";
+    state.AssemblyFileVersion = $"{majorVersion}.{minorVersion}.{patchVersion}.{buildCounter}";
 
-    data.PackageVersion = string.IsNullOrWhiteSpace(versionSuffix) 
+    state.PackageVersion = string.IsNullOrWhiteSpace(versionSuffix) 
         ? $"{majorVersion}.{minorVersion}.{patchVersion}"
         : buildCounter > 0
             ? $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}.{buildCounter}"
             : $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}";
 
-    data.BuildNumber = string.IsNullOrWhiteSpace(versionSuffix)
+    state.BuildNumber = string.IsNullOrWhiteSpace(versionSuffix)
         ? $"{majorVersion}.{minorVersion}.{patchVersion}+{branch}.{buildCounter}"
         : $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}+{branch}.{buildCounter}";
 
-    data.InformationalVersion = string.IsNullOrWhiteSpace(buildMetadata)
-        ? data.BuildNumber
-        : $"{data.BuildNumber}#{buildMetadata}";
+    state.InformationalVersion = string.IsNullOrWhiteSpace(buildMetadata)
+        ? state.BuildNumber
+        : $"{state.BuildNumber}#{buildMetadata}";
 
-    // Tell TeamCity the build number if required.
-    if (BuildSystem.IsRunningOnTeamCity) {
-        BuildSystem.TeamCity.SetBuildNumber(data.BuildNumber);
+    if (!string.Equals(state.Target, "Clean", StringComparison.OrdinalIgnoreCase)) {
+        BuildUtilities.SetBuildSystemBuildNumber(BuildSystem, state.BuildNumber);
+        BuildUtilities.WriteBuildStateToLog(BuildSystem, state);
     }
 
-    data.Dump();
-
-    return data;
+    return state;
 });
 
 
 // Pre-task action.
 TaskSetup(context => {
-    if (BuildSystem.IsRunningOnTeamCity) {
-        BuildSystem.TeamCity.WriteStartProgress(context.Task.Name);
-    }
+    BuildUtilities.WriteTaskStartMessage(BuildSystem, context.Task.Name);
 });
 
 
 // Post task action.
 TaskTeardown(context => {
-    if (BuildSystem.IsRunningOnTeamCity) {
-        BuildSystem.TeamCity.WriteEndProgress(context.Task.Name);
-    }
+    BuildUtilities.WriteTaskEndMessage(BuildSystem, context.Task.Name);
 });
 
 
@@ -212,17 +126,17 @@ TaskTeardown(context => {
 
 // Cleans up artifact and bin folders.
 Task("Clean")
-    .WithCriteria<BuildData>((c, data) => data.Clean)
-    .Does<BuildData>(data => {
-        CleanDirectories($"./src/**/bin/{data.Configuration}");
+    .WithCriteria<BuildState>((c, state) => state.Clean)
+    .Does<BuildState>(state => {
+        CleanDirectories($"./src/**/bin/{state.Configuration}");
         CleanDirectory($"./artifacts");
     });
 
 
 // Restores NuGet packages.
 Task("Restore")
-    .Does<BuildData>(data => {
-        DotNetCoreRestore(data.SolutionName);
+    .Does<BuildState>(state => {
+        DotNetCoreRestore(state.SolutionName);
     });
 
 
@@ -230,24 +144,24 @@ Task("Restore")
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
-    .Does<BuildData>(data => {
+    .Does<BuildState>(state => {
         var buildSettings = new DotNetCoreBuildSettings {
-            Configuration = data.Configuration,
+            Configuration = state.Configuration,
             MSBuildSettings = new DotNetCoreMSBuildSettings()
         };
 
-        buildSettings.MSBuildSettings.Targets.Add(data.Rebuild ? "Rebuild" : "Build");
-        data.ApplyMSBuildProperties(buildSettings.MSBuildSettings);
-        DotNetCoreBuild(data.SolutionName, buildSettings);
+        buildSettings.MSBuildSettings.Targets.Add(state.Rebuild ? "Rebuild" : "Build");
+        BuildUtilities.ApplyMSBuildProperties(buildSettings.MSBuildSettings, state);
+        DotNetCoreBuild(state.SolutionName, buildSettings);
     });
 
 
 // Runs unit tests.
 Task("Test")
     .IsDependentOn("Build")
-    .Does<BuildData>(data => {
-        DotNetCoreTest(data.SolutionName, new DotNetCoreTestSettings {
-            Configuration = data.Configuration,
+    .Does<BuildState>(state => {
+        DotNetCoreTest(state.SolutionName, new DotNetCoreTestSettings {
+            Configuration = state.Configuration,
             NoBuild = true
         });
     });
@@ -256,16 +170,16 @@ Task("Test")
 // Builds NuGet packages.
 Task("Pack")
     .IsDependentOn("Test")
-    .Does<BuildData>(data => {
+    .Does<BuildState>(state => {
         var buildSettings = new DotNetCoreBuildSettings {
-            Configuration = data.Configuration,
+            Configuration = state.Configuration,
             NoRestore = true,
             MSBuildSettings = new DotNetCoreMSBuildSettings()
         };
 
         buildSettings.MSBuildSettings.Targets.Add("Pack");
-        data.ApplyMSBuildProperties(buildSettings.MSBuildSettings);
-        DotNetCoreBuild(data.SolutionName, buildSettings);
+        BuildUtilities.ApplyMSBuildProperties(buildSettings.MSBuildSettings, state);
+        DotNetCoreBuild(state.SolutionName, buildSettings);
     });
 
 
