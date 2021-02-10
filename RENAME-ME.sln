@@ -10,12 +10,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{10A2813D-C97
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{C4C50D71-6AAC-45A9-9257-5D02A42B61DC}"
 	ProjectSection(SolutionItems) = preProject
+		build\build-state.cake = build\build-state.cake
+		build\build-utilities.cake = build\build-utilities.cake
 		build\Dependencies.props = build\Dependencies.props
-		build\Get-Version.ps1 = build\Get-Version.ps1
 		build\NetFX.targets = build\NetFX.targets
 		build\README.md = build\README.md
-		build\Set-TeamCityParameters.ps1 = build\Set-TeamCityParameters.ps1
-		build\Tools.ps1 = build\Tools.ps1
 		build\version.json = build\version.json
 	EndProjectSection
 EndProject
@@ -24,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{0390FA
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		build.cake = build.cake
 		build.ps1 = build.ps1
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
