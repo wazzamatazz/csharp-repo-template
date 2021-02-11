@@ -2,10 +2,14 @@
 public static class BuildUtilities {
 
     // Informs the build system of the build number that is being used.
-    public static void SetBuildSystemBuildNumber(BuildSystem buildSystem, string buildNumber) {
+    public static void SetBuildSystemBuildNumber(BuildSystem buildSystem, BuildState buildState) {
         // Tell TeamCity the build number if required.
         if (buildSystem.IsRunningOnTeamCity) {
-            buildSystem.TeamCity.SetBuildNumber(buildNumber);
+            buildSystem.TeamCity.SetBuildNumber(buildState.BuildNumber);
+            buildSystem.TeamCity.SetParameter("system.AssemblyVersion", buildState.AssemblyVersion);
+            buildSystem.TeamCity.SetParameter("system.AssemblyFileVersion", buildState.AssemblyFileVersion);
+            buildSystem.TeamCity.SetParameter("system.InformationalVersion", buildState.InformationalVersion);
+            buildSystem.TeamCity.SetParameter("system.PackageVersion", buildState.PackageVersion);
         }
     }
 
@@ -22,17 +26,17 @@ public static class BuildUtilities {
 
 
     // Writes a task started message.
-    public static void WriteTaskStartMessage(BuildSystem buildSystem, string name) {
+    public static void WriteTaskStartMessage(BuildSystem buildSystem, string description) {
         if (buildSystem.IsRunningOnTeamCity) {
-            buildSystem.TeamCity.WriteStartProgress(name);
+            buildSystem.TeamCity.WriteStartBuildBlock(description);
         }
     }
 
 
     // Writes a task completed message.
-    public static void WriteTaskEndMessage(BuildSystem buildSystem, string name) {
+    public static void WriteTaskEndMessage(BuildSystem buildSystem, string description) {
         if (buildSystem.IsRunningOnTeamCity) {
-            buildSystem.TeamCity.WriteEndProgress(name);
+            buildSystem.TeamCity.WriteEndBuildBlock(description);
         }
     }
 
@@ -67,9 +71,21 @@ public static class BuildUtilities {
 
         // Set version numbers.
         settings.Properties["AssemblyVersion"] = new List<string> { state.AssemblyVersion };
-        settings.Properties["AssemblyFileVersion"] = new List<string> { state.AssemblyFileVersion };
+        settings.Properties["FileVersion"] = new List<string> { state.AssemblyFileVersion };
         settings.Properties["Version"] = new List<string> { state.PackageVersion };
         settings.Properties["InformationalVersion"] = new List<string> { state.InformationalVersion };
+    }
+
+
+    // Imports test results into the build system.
+    public static void ImportTestResults(BuildSystem buildSystem, string testProvider, FilePath resultsFile) {
+        if (resultsFile == null) {
+            return;
+        }
+
+        if (buildSystem.IsRunningOnTeamCity) {
+            buildSystem.TeamCity.ImportData(testProvider, resultsFile);
+        }
     }
 
 }

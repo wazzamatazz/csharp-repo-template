@@ -4,13 +4,17 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 // COMMAND LINE ARGUMENTS:
 //
 // --project=<PROJECT OR SOLUTION>
-//   The MSBuild project or solution to build. Default: see DefaultSolutionName constant above.
+//   The MSBuild project or solution to build. 
+//     Default: see DefaultSolutionName constant above.
 //
 // --target=<TARGET>
-//   Specifies the Cake target to run. Default: Test
+//   Specifies the Cake target to run. 
+//     Default: Test
+//     Possible Values: Clean, Restore, Build, Test, Pack
 //
 // --configuration=<CONFIGURATION>
-//   Specifies the MSBuild configuration to use. Default: Debug
+//   Specifies the MSBuild configuration to use. 
+//     Default: Debug
 //
 // --rebuild
 //   Specifies if this is a rebuild rather than an incremental build. All artifact and bin folders 
@@ -24,9 +28,6 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 //   Tells MSBuild that signing is required by setting the 'SignOutput' property to 'True'. The 
 //   signing implementation must be supplied by MSBuild.
 //
-// --branch=<BRANCH>
-//   The source control branch name that is being build. Default: master
-//
 // --build-counter=<COUNTER>
 //   The build counter. This is used when generating version numbers for the build.
 //
@@ -39,6 +40,7 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 // 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#addin nuget:?package=Cake.Git&version=1.0.0
 #addin nuget:?package=Cake.Json&version=5.2.0
 #addin nuget:?package=Newtonsoft.Json&version=11.0.2
 
@@ -56,54 +58,68 @@ var target = Argument("target", "Test");
 
 // Constructs the build state object.
 Setup<BuildState>(context => {
-    var state = new BuildState() {
-        SolutionName = Argument("project", DefaultSolutionName),
-        Target = target,
-        Configuration = Argument("configuration", "Debug"),
-        ContinuousIntegrationBuild = HasArgument("ci") || !BuildSystem.IsLocalBuild,
-        Rebuild = HasArgument("rebuild"),
-        SignOutput = HasArgument("sign-output"),
-        Verbose = HasArgument("verbose")
-    };
+    try {
+        BuildUtilities.WriteTaskStartMessage(BuildSystem, "Setup");
+        var state = new BuildState() {
+            SolutionName = Argument("project", DefaultSolutionName),
+            Target = target,
+            Configuration = Argument("configuration", "Debug"),
+            ContinuousIntegrationBuild = HasArgument("ci") || !BuildSystem.IsLocalBuild,
+            Rebuild = HasArgument("rebuild"),
+            SignOutput = HasArgument("sign-output"),
+            Verbose = HasArgument("verbose")
+        };
 
-    // Get raw version numbers from JSON.
+        // Get raw version numbers from JSON.
 
-    var versionJson = ParseJsonFromFile("./build/version.json");
+        var versionJson = ParseJsonFromFile("./build/version.json");
 
-    var majorVersion = versionJson.Value<int>("Major");
-    var minorVersion = versionJson.Value<int>("Minor");
-    var patchVersion = versionJson.Value<int>("Patch");
-    var versionSuffix = versionJson.Value<string>("PreRelease");
+        var majorVersion = versionJson.Value<int>("Major");
+        var minorVersion = versionJson.Value<int>("Minor");
+        var patchVersion = versionJson.Value<int>("Patch");
+        var versionSuffix = versionJson.Value<string>("PreRelease");
 
-    // Compute version numbers.
+        // Compute version numbers.
 
-    var buildCounter = Argument("build-counter", 0);
-    var buildMetadata = Argument("build-metadata", "");
-    var branch = Argument("branch", "master");
+        var buildCounter = Argument("build-counter", 0);
+        var buildMetadata = Argument("build-metadata", state.ContinuousIntegrationBuild ? "" : "unofficial");
+        if (!string.IsNullOrEmpty(buildMetadata)) {
+            var buildMetadataValidator = new System.Text.RegularExpressions.Regex(@"^[0-9A-Aa-z-]+(\.[0-9A-Aa-z-]+)*$");
+            if (!buildMetadataValidator.Match(buildMetadata).Success) {
+                throw new Exception($"Build metadata '{buildMetadata}' is invalid. Metadata must consist of dot-delimited groups of ASCII alphanumerics and hyphens (i.e. [0-9A-Za-z-]). See https://semver.org/#spec-item-10 for details.");
+            }
+        }
+        var branch = GitBranchCurrent(DirectoryPath.FromString(".")).FriendlyName;
 
-    state.AssemblyVersion = $"{majorVersion}.{minorVersion}.0.0";
-    state.AssemblyFileVersion = $"{majorVersion}.{minorVersion}.{patchVersion}.{buildCounter}";
+        state.AssemblyVersion = $"{majorVersion}.{minorVersion}.0.0";
+        state.AssemblyFileVersion = $"{majorVersion}.{minorVersion}.{patchVersion}.{buildCounter}";
 
-    state.PackageVersion = string.IsNullOrWhiteSpace(versionSuffix) 
-        ? $"{majorVersion}.{minorVersion}.{patchVersion}"
-        : buildCounter > 0
-            ? $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}.{buildCounter}"
-            : $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}";
+        state.PackageVersion = string.IsNullOrWhiteSpace(versionSuffix) 
+            ? $"{majorVersion}.{minorVersion}.{patchVersion}"
+            : $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}.{buildCounter}";
 
-    state.BuildNumber = string.IsNullOrWhiteSpace(versionSuffix)
-        ? $"{majorVersion}.{minorVersion}.{patchVersion}+{branch}.{buildCounter}"
-        : $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}+{branch}.{buildCounter}";
+        if (!string.IsNullOrEmpty(buildMetadata)) {
+            state.PackageVersion = string.Concat(state.PackageVersion, "+", buildMetadata);
+        }
 
-    state.InformationalVersion = string.IsNullOrWhiteSpace(buildMetadata)
-        ? state.BuildNumber
-        : $"{state.BuildNumber}#{buildMetadata}";
+        state.BuildNumber = string.IsNullOrWhiteSpace(versionSuffix)
+            ? $"{majorVersion}.{minorVersion}.{patchVersion}.{buildCounter}+{branch}"
+            : $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}.{buildCounter}+{branch}";
 
-    if (!string.Equals(state.Target, "Clean", StringComparison.OrdinalIgnoreCase)) {
-        BuildUtilities.SetBuildSystemBuildNumber(BuildSystem, state.BuildNumber);
-        BuildUtilities.WriteBuildStateToLog(BuildSystem, state);
+        state.InformationalVersion = string.IsNullOrWhiteSpace(buildMetadata)
+            ? state.BuildNumber
+            : $"{state.BuildNumber}#{buildMetadata}";
+
+        if (!string.Equals(state.Target, "Clean", StringComparison.OrdinalIgnoreCase)) {
+            BuildUtilities.SetBuildSystemBuildNumber(BuildSystem, state);
+            BuildUtilities.WriteBuildStateToLog(BuildSystem, state);
+        }
+
+        return state;
     }
-
-    return state;
+    finally {
+        BuildUtilities.WriteTaskEndMessage(BuildSystem, "Setup");
+    }
 });
 
 
@@ -128,8 +144,10 @@ TaskTeardown(context => {
 Task("Clean")
     .WithCriteria<BuildState>((c, state) => state.Clean)
     .Does<BuildState>(state => {
-        CleanDirectories($"./src/**/bin/{state.Configuration}");
-        CleanDirectory($"./artifacts");
+        foreach (var pattern in new [] { $"./src/**/bin/{state.Configuration}", "./artifacts/**", "./TestResults/**" }) {
+            BuildUtilities.WriteLogMessage(BuildSystem, $"Cleaning directories: {pattern}");
+            CleanDirectories(pattern);
+        }
     });
 
 
@@ -147,6 +165,7 @@ Task("Build")
     .Does<BuildState>(state => {
         var buildSettings = new DotNetCoreBuildSettings {
             Configuration = state.Configuration,
+            NoRestore = true,
             MSBuildSettings = new DotNetCoreMSBuildSettings()
         };
 
@@ -160,10 +179,25 @@ Task("Build")
 Task("Test")
     .IsDependentOn("Build")
     .Does<BuildState>(state => {
-        DotNetCoreTest(state.SolutionName, new DotNetCoreTestSettings {
+        var testSettings = new DotNetCoreTestSettings {
             Configuration = state.Configuration,
             NoBuild = true
-        });
+        };
+
+        var testResultsFile = state.ContinuousIntegrationBuild
+            ? new FilePath($"./TestResults/TestResults-{DateTime.UtcNow:yyyyMMddHHmmss}.trx").MakeAbsolute(Context.Environment.WorkingDirectory)
+            : null;
+
+        if (testResultsFile != null) {
+            // We're using a build system; write the test results to a file so that they can be 
+            // imported into the build system.
+            testSettings.Loggers = new List<string> {
+                $"trx;LogFileName={testResultsFile.FullPath}"
+            };
+        }
+
+        DotNetCoreTest(state.SolutionName, testSettings);
+        BuildUtilities.ImportTestResults(BuildSystem, "mstest", testResultsFile);
     });
 
 
@@ -171,15 +205,15 @@ Task("Test")
 Task("Pack")
     .IsDependentOn("Test")
     .Does<BuildState>(state => {
-        var buildSettings = new DotNetCoreBuildSettings {
+        var buildSettings = new DotNetCorePackSettings {
             Configuration = state.Configuration,
             NoRestore = true,
+            NoBuild = true,
             MSBuildSettings = new DotNetCoreMSBuildSettings()
         };
 
-        buildSettings.MSBuildSettings.Targets.Add("Pack");
         BuildUtilities.ApplyMSBuildProperties(buildSettings.MSBuildSettings, state);
-        DotNetCoreBuild(state.SolutionName, buildSettings);
+        DotNetCorePack(state.SolutionName, buildSettings);
     });
 
 
