@@ -13,11 +13,11 @@ public class BuildState {
     // The MSBuild configuration.
     public string Configuration { get; set; }
 
-    // Specifies if this is a rebuild or an incremental build.
-    public bool Rebuild { get; set; }
+    // Specifies if a clean should be performed prior to running the specified target.
+    public bool Clean { get; set; }
 
-    // Specifies if artifacts and bin folders should be cleaned before building.
-    public bool Clean => Rebuild || string.Equals(Target, "Clean", StringComparison.OrdinalIgnoreCase);
+    // Specifies if the Clean target should be run.
+    public bool RunCleanTarget => Clean || string.Equals(Target, "Clean", StringComparison.OrdinalIgnoreCase);
 
     // Specifies if this is a continuous integration build.
     public bool ContinuousIntegrationBuild { get; set; }

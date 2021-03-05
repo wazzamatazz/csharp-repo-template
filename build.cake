@@ -16,9 +16,9 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 //   Specifies the MSBuild configuration to use. 
 //     Default: Debug
 //
-// --rebuild
-//   Specifies if this is a rebuild rather than an incremental build. All artifact and bin folders 
-//   will be cleaned prior to a rebuild.
+// --clean
+//   Specifies if this is a rebuild rather than an incremental build. All artifact, bin, and test 
+//   output folders will be cleaned prior to running the specified target.
 //
 // --ci
 //   Forces continuous integration build mode. Not required if the build is being run by a 
@@ -41,8 +41,8 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #addin nuget:?package=Cake.Git&version=1.0.0
-#addin nuget:?package=Cake.Json&version=5.2.0
-#addin nuget:?package=Newtonsoft.Json&version=11.0.2
+#addin nuget:?package=Cake.Json&version=6.0.0
+#addin nuget:?package=Newtonsoft.Json&version=12.0.3
 
 #load "build/build-state.cake"
 #load "build/build-utilities.cake"
@@ -65,7 +65,7 @@ Setup<BuildState>(context => {
             Target = target,
             Configuration = Argument("configuration", "Debug"),
             ContinuousIntegrationBuild = HasArgument("ci") || !BuildSystem.IsLocalBuild,
-            Rebuild = HasArgument("rebuild"),
+            Clean = HasArgument("clean"),
             SignOutput = HasArgument("sign-output"),
             Verbose = HasArgument("verbose")
         };
@@ -142,9 +142,9 @@ TaskTeardown(context => {
 
 // Cleans up artifact and bin folders.
 Task("Clean")
-    .WithCriteria<BuildState>((c, state) => state.Clean)
+    .WithCriteria<BuildState>((c, state) => state.RunCleanTarget)
     .Does<BuildState>(state => {
-        foreach (var pattern in new [] { $"./src/**/bin/{state.Configuration}", "./artifacts/**", "./TestResults/**" }) {
+        foreach (var pattern in new [] { $"./src/**/bin/{state.Configuration}", "./artifacts/**", "./**/TestResults/**" }) {
             BuildUtilities.WriteLogMessage(BuildSystem, $"Cleaning directories: {pattern}");
             CleanDirectories(pattern);
         }
@@ -169,7 +169,7 @@ Task("Build")
             MSBuildSettings = new DotNetCoreMSBuildSettings()
         };
 
-        buildSettings.MSBuildSettings.Targets.Add(state.Rebuild ? "Rebuild" : "Build");
+        buildSettings.MSBuildSettings.Targets.Add(state.Clean ? "Rebuild" : "Build");
         BuildUtilities.ApplyMSBuildProperties(buildSettings.MSBuildSettings, state);
         DotNetCoreBuild(state.SolutionName, buildSettings);
     });
@@ -184,20 +184,25 @@ Task("Test")
             NoBuild = true
         };
 
-        var testResultsFile = state.ContinuousIntegrationBuild
-            ? new FilePath($"./TestResults/TestResults-{DateTime.UtcNow:yyyyMMddHHmmss}.trx").MakeAbsolute(Context.Environment.WorkingDirectory)
+        var testResultsPrefix = state.ContinuousIntegrationBuild
+            ? Guid.NewGuid().ToString()
             : null;
 
-        if (testResultsFile != null) {
+        if (testResultsPrefix != null) {
             // We're using a build system; write the test results to a file so that they can be 
             // imported into the build system.
             testSettings.Loggers = new List<string> {
-                $"trx;LogFileName={testResultsFile.FullPath}"
+                $"trx;LogFilePrefix={testResultsPrefix}"
             };
         }
 
         DotNetCoreTest(state.SolutionName, testSettings);
-        BuildUtilities.ImportTestResults(BuildSystem, "mstest", testResultsFile);
+
+        if (testResultsPrefix != null) {
+            foreach (var testResultsFile in GetFiles($"./**/TestResults/{testResultsPrefix}*.trx")) {
+                BuildUtilities.ImportTestResults(BuildSystem, "mstest", testResultsFile);
+            }
+        }
     });
 
 
