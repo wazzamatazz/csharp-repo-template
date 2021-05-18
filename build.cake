@@ -79,36 +79,14 @@ Setup<BuildState>(context => {
         var patchVersion = versionJson.Value<int>("Patch");
         var versionSuffix = versionJson.Value<string>("PreRelease");
 
-        // Compute version numbers.
+        // Compute build number.
 
         var buildCounter = Argument("build-counter", 0);
-        var buildMetadata = Argument("build-metadata", state.ContinuousIntegrationBuild ? "" : "unofficial");
-        if (!string.IsNullOrEmpty(buildMetadata)) {
-            var buildMetadataValidator = new System.Text.RegularExpressions.Regex(@"^[0-9A-Aa-z-]+(\.[0-9A-Aa-z-]+)*$");
-            if (!buildMetadataValidator.Match(buildMetadata).Success) {
-                throw new Exception($"Build metadata '{buildMetadata}' is invalid. Metadata must consist of dot-delimited groups of ASCII alphanumerics and hyphens (i.e. [0-9A-Za-z-]). See https://semver.org/#spec-item-10 for details.");
-            }
-        }
         var branch = GitBranchCurrent(DirectoryPath.FromString(".")).FriendlyName;
-
-        state.AssemblyVersion = $"{majorVersion}.{minorVersion}.0.0";
-        state.AssemblyFileVersion = $"{majorVersion}.{minorVersion}.{patchVersion}.{buildCounter}";
-
-        state.PackageVersion = string.IsNullOrWhiteSpace(versionSuffix) 
-            ? $"{majorVersion}.{minorVersion}.{patchVersion}"
-            : $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}.{buildCounter}";
-
-        if (!string.IsNullOrEmpty(buildMetadata)) {
-            state.PackageVersion = string.Concat(state.PackageVersion, "+", buildMetadata);
-        }
 
         state.BuildNumber = string.IsNullOrWhiteSpace(versionSuffix)
             ? $"{majorVersion}.{minorVersion}.{patchVersion}.{buildCounter}+{branch}"
             : $"{majorVersion}.{minorVersion}.{patchVersion}-{versionSuffix}.{buildCounter}+{branch}";
-
-        state.InformationalVersion = string.IsNullOrWhiteSpace(buildMetadata)
-            ? state.BuildNumber
-            : $"{state.BuildNumber}#{buildMetadata}";
 
         if (!string.Equals(state.Target, "Clean", StringComparison.OrdinalIgnoreCase)) {
             BuildUtilities.SetBuildSystemBuildNumber(BuildSystem, state);

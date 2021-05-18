@@ -2,7 +2,8 @@
 
 Repository template for a C# project.
 
-## Getting Started
+
+# Getting Started
 
 - Create a new repository on GitHub and choose this repository as the template, or click on the _"Use this template"_ button on the repository home page.
 - Rename the solution file in the root of the repository (`RENAME-ME.sln`).
@@ -12,7 +13,8 @@ Repository template for a C# project.
 - Create test and benchmarking projects in the `test` folder.
 - Create example projects that demonstrate the library and application projects in the `samples` folder.
 
-## Repository Structure
+
+# Repository Structure
 
 The repository is organised as follows:
 
