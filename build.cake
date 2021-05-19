@@ -77,7 +77,7 @@ Setup<BuildState>(context => {
             SkipTests = HasArgument("no-tests"),
             SignOutput = HasArgument("sign-output"),
             Verbose = HasArgument("verbose"),
-            MSBuildProperties = Arguments<string>("property")
+            MSBuildProperties = HasArgument("property") ? Arguments<string>("property") : new List<string>()
         };
 
         // Get raw version numbers from JSON.
