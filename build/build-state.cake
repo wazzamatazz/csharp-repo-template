@@ -19,6 +19,9 @@ public class BuildState {
     // Specifies if the Clean target should be run.
     public bool RunCleanTarget => Clean || string.Equals(Target, "Clean", StringComparison.OrdinalIgnoreCase);
 
+    // Specifies if tests should be skipped.
+    public bool SkipTests { get; set; }
+
     // Specifies if this is a continuous integration build.
     public bool ContinuousIntegrationBuild { get; set; }
 
@@ -28,7 +31,10 @@ public class BuildState {
     // Specifies if output signing is allowed.
     public bool CanSignOutput => SignOutput && ContinuousIntegrationBuild;
 
-    // Specifies if verbose loigging should be used.
+    // Specifies if verbose logging should be used.
     public bool Verbose { get; set; }
+
+    // Additional MSBuild properties.
+    public ICollection<string> MSBuildProperties { get; set; }
 
 }
