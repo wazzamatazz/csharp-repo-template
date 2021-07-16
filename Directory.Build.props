@@ -5,9 +5,6 @@
     <ParentProject>$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../'))</ParentProject>
   </PropertyGroup>
   <Import Project="$(ParentProject)" Condition=" '$(ParentProject)' != '' " /> 
-  
-  <!-- Import common NuGet package versions -->
-  <Import Project=".\build\Dependencies.props" Condition="Exists('.\build\Dependencies.props')" />
 
   <PropertyGroup>
     <Authors>{{AUTHORS}}</Authors>
@@ -17,8 +14,24 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <NeutralLanguage>en</NeutralLanguage>
     <CopyrightStartYear>{{COPYRIGHT_START_YEAR}}</CopyrightStartYear>
-    <VersionPropertiesInputFile Condition="Exists('$(MSBuildThisFileDirectory)build\version.json')">$(MSBuildThisFileDirectory)build\version.json</VersionPropertiesInputFile>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- 
+    IMPORTANT: 
+    
+    This version will always be overridden by the version specified in build/version.json when 
+    building via build.ps1 or build.sh. It is defined here to allow Visual Studio to build with 
+    the solution with the correct version number.
+    -->
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <!-- Import common NuGet package versions. -->
+  <Import Project=".\build\Dependencies.props" Condition="Exists('.\build\Dependencies.props')" />
+
+  <!-- Set copyright notice based on CopyrightStartYear property. -->
+  <Import Project=".\build\Copyright.props" Condition="Exists('.\build\Copyright.props')" />
 
   <!-- Extension point to allow Continuous Integration systems to inject their own configuration. -->
   <Import Project="CI.props" Condition="Exists('CI.props')" />

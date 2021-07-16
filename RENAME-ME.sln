@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{C4C50D71
 	ProjectSection(SolutionItems) = preProject
 		build\build-state.cake = build\build-state.cake
 		build\build-utilities.cake = build\build-utilities.cake
+		build\Copyright.props = build\Copyright.props
 		build\Dependencies.props = build\Dependencies.props
 		build\NetFX.targets = build\NetFX.targets
 		build\README.md = build\README.md

@@ -31,6 +31,7 @@ The repository is organised as follows:
   - `[build]` - Resources for building the solution.
     - `build-state.cake` - Additional build script.
     - `build-utilities.cake` - Additional build script.
+    - `Copyright.props` - Sets the copyright message for all projects in the solution.
     - `Dependencies.props` - Common NuGet package versions.
     - `NetFX.targets` - Adds package references for building projects that target .NET Framework on non-Windows systems.
     - `version.json` - Defines version numbers used when building the projects.

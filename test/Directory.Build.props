@@ -10,7 +10,7 @@
     <IsPackable>false</IsPackable>
     <SignOutput>false</SignOutput>
     <DeterministicSourcePaths>false</DeterministicSourcePaths>
-    <IncludeDevelopmentPackages>false</IncludeDevelopmentPackages>
+    <DisableSourceLink>true</DisableSourceLink>
   </PropertyGroup>
 
 </Project>

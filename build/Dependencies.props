@@ -12,12 +12,10 @@
   
   <!-- Dev/Test/Benchmark Packages -->
   <PropertyGroup>
-    <JaahasMSBuildExtensionsVersion>1.0.4</JaahasMSBuildExtensionsVersion>
-    <MicrosoftCodeAnalysisNetAnalyzersVersion>5.0.3</MicrosoftCodeAnalysisNetAnalyzersVersion>
-    <MicrosoftNETTestSdkVersion>16.9.4</MicrosoftNETTestSdkVersion>
+    <MicrosoftNETTestSdkVersion>16.10.0</MicrosoftNETTestSdkVersion>
     <MicrosoftSourceLinkGitHubVersion>1.0.0</MicrosoftSourceLinkGitHubVersion>
-    <MSTestTestAdapterVersion>2.2.3</MSTestTestAdapterVersion>
-    <MSTestTestFrameworkVersion>2.2.3</MSTestTestFrameworkVersion>
+    <MSTestTestAdapterVersion>2.2.5</MSTestTestAdapterVersion>
+    <MSTestTestFrameworkVersion>2.2.5</MSTestTestFrameworkVersion>
   </PropertyGroup>
   
   <!-- Other Packages -->
