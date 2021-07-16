@@ -2,11 +2,11 @@
 
 <Project>
 
-  <!-- CoreFX Packages -->
+  <!-- Microsoft Packages -->
   <PropertyGroup>
   </PropertyGroup>
   
-  <!-- Other Microsoft Packages -->
+  <!-- Non-Microsoft Packages -->
   <PropertyGroup>
   </PropertyGroup>
   
@@ -16,10 +16,6 @@
     <MicrosoftSourceLinkGitHubVersion>1.0.0</MicrosoftSourceLinkGitHubVersion>
     <MSTestTestAdapterVersion>2.2.5</MSTestTestAdapterVersion>
     <MSTestTestFrameworkVersion>2.2.5</MSTestTestFrameworkVersion>
-  </PropertyGroup>
-  
-  <!-- Other Packages -->
-  <PropertyGroup>
   </PropertyGroup>
   
 </Project>

@@ -26,6 +26,7 @@ The repository is organised as follows:
   - `build.ps1` - PowerShell script to bootstrap and run the Cake script.
   - `Directory.Build.props` - Common MSBuild properties and targets (see [here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build) for details).
   - `Directory.Build.targets` - Common MSBuild properties and targets (see [here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build) for details). 
+  - `LICENSE` - Licence details.
   - `README.md`
   - `RENAME-ME.sln` - Visual Studio solution file.
   - `[build]` - Resources for building the solution.
