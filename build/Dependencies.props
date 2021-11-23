@@ -12,10 +12,10 @@
   
   <!-- Dev/Test/Benchmark Packages -->
   <PropertyGroup>
-    <MicrosoftNETTestSdkVersion>16.10.0</MicrosoftNETTestSdkVersion>
-    <MicrosoftSourceLinkGitHubVersion>1.0.0</MicrosoftSourceLinkGitHubVersion>
-    <MSTestTestAdapterVersion>2.2.5</MSTestTestAdapterVersion>
-    <MSTestTestFrameworkVersion>2.2.5</MSTestTestFrameworkVersion>
+    <MicrosoftNETTestSdkVersion>17.0.0</MicrosoftNETTestSdkVersion>
+    <MicrosoftSourceLinkGitHubVersion>1.1.0</MicrosoftSourceLinkGitHubVersion>
+    <MSTestTestAdapterVersion>2.2.7</MSTestTestAdapterVersion>
+    <MSTestTestFrameworkVersion>2.2.7</MSTestTestFrameworkVersion>
   </PropertyGroup>
   
 </Project>
