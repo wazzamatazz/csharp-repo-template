@@ -52,9 +52,9 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 // 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#addin nuget:?package=Cake.Git&version=1.0.0
-#addin nuget:?package=Cake.Json&version=6.0.0
-#addin nuget:?package=Newtonsoft.Json&version=12.0.3
+#addin nuget:?package=Cake.Git&version=1.1.0
+#addin nuget:?package=Cake.Json&version=6.0.1
+#addin nuget:?package=Newtonsoft.Json&version=13.0.1
 
 #load "build/build-state.cake"
 #load "build/build-utilities.cake"
