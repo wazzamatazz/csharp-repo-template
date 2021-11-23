@@ -25,7 +25,7 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 //   output folders will be cleaned prior to running the specified target.
 //
 // --no-tests
-//   Specifies that tests should be skipped.
+//   Specifies that tests should be skipped. Ignored if the target is not Test or Pack.
 //
 // --ci
 //   Forces continuous integration build mode. Not required if the build is being run by a 
