@@ -8,7 +8,7 @@ Repository template for a C# project.
 - Create a new repository on GitHub and choose this repository as the template, or click on the _"Use this template"_ button on the repository home page.
 - Rename the solution file in the root of the repository ([RENAME-ME.sln](/RENAME-ME.sln)).
 - Update [Directory.Build.props](/Directory.Build.props) in the root folder and replace the placeholder values in the shared project properties (e.g. `{{COPYRIGHT_START_YEAR}}`).
-- Update [build.cake](/build.cake) in the root folder and replace the `DefaultSolutionName` constant at the start of the file with the name of your solution file.
+- Update [build.cake](/build.cake) in the root folder and replace the `DefaultSolutionFile` constant at the start of the file with the name of your solution file.
 - Create new library and application projects in the `src` folder.
 - Create test and benchmarking projects in the `test` folder.
 - Create example projects that demonstrate the library and application projects in the `samples` folder.
@@ -30,8 +30,6 @@ The repository is organised as follows:
   - `README.md`
   - `RENAME-ME.sln` - Visual Studio solution file.
   - `[build]` - Resources for building the solution.
-    - `build-state.cake` - Additional build script.
-    - `build-utilities.cake` - Additional build script.
     - `Copyright.props` - Sets the copyright message for all projects in the solution.
     - `Dependencies.props` - Common NuGet package versions.
     - `NetFX.targets` - Adds package references for building projects that target .NET Framework on non-Windows systems.
