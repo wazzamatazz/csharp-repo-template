@@ -24,6 +24,7 @@ The repository is organised as follows:
   - `.gitignore`
   - `build.cake` - [Cake](https://cakebuild.net/) script for building the projects.
   - `build.ps1` - PowerShell script to bootstrap and run the Cake script.
+  - `build.sh` - Bourne shell script to bootstrap and run the Cake script.
   - `Directory.Build.props` - Common MSBuild properties and targets (see [here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build) for details).
   - `Directory.Build.targets` - Common MSBuild properties and targets (see [here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build) for details). 
   - `LICENSE` - Licence details.
