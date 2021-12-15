@@ -58,7 +58,7 @@ public static class BuildUtilities {
 
 
     // Adds MSBuild properties from properties specified via the "property" command line argument.
-    public static void ApplyMSBuildPropertiesFromArguments(DotNetCoreMSBuildSettings settings, ICollection<string> props) {
+    public static void ApplyMSBuildPropertiesFromArguments(DotNetMSBuildSettings settings, ICollection<string> props) {
         if (props?.Count == 0) {
             return;
         }
@@ -82,7 +82,7 @@ public static class BuildUtilities {
 
 
     // Adds MSBuild properties from the build state.
-    public static void ApplyMSBuildProperties(DotNetCoreMSBuildSettings settings, BuildState state) {
+    public static void ApplyMSBuildProperties(DotNetMSBuildSettings settings, BuildState state) {
         if (state.MSBuildProperties?.Count > 0) {
             // We expect each property to be in "NAME=VALUE" format.
             var regex = new System.Text.RegularExpressions.Regex(@"^(?<name>.+)=(?<value>.+)$");

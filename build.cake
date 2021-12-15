@@ -52,9 +52,8 @@ const string DefaultSolutionName = "./RENAME-ME.sln";
 // 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#addin nuget:?package=Cake.Git&version=1.1.0
-#addin nuget:?package=Cake.Json&version=6.0.1
-#addin nuget:?package=Newtonsoft.Json&version=13.0.1
+#addin nuget:?package=Cake.Git&version=2.0.0
+#addin nuget:?package=Cake.Json&version=7.0.1
 
 #load "build/build-state.cake"
 #load "build/build-utilities.cake"
@@ -165,7 +164,7 @@ Task("Clean")
 // Restores NuGet packages.
 Task("Restore")
     .Does<BuildState>(state => {
-        DotNetCoreRestore(state.SolutionName);
+        DotNetRestore(state.SolutionName);
     });
 
 
@@ -174,15 +173,15 @@ Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
     .Does<BuildState>(state => {
-        var buildSettings = new DotNetCoreBuildSettings {
+        var buildSettings = new DotNetBuildSettings {
             Configuration = state.Configuration,
             NoRestore = true,
-            MSBuildSettings = new DotNetCoreMSBuildSettings()
+            MSBuildSettings = new DotNetMSBuildSettings()
         };
 
         buildSettings.MSBuildSettings.Targets.Add(state.Clean ? "Rebuild" : "Build");
         BuildUtilities.ApplyMSBuildProperties(buildSettings.MSBuildSettings, state);
-        DotNetCoreBuild(state.SolutionName, buildSettings);
+        DotNetBuild(state.SolutionName, buildSettings);
     });
 
 
@@ -191,7 +190,7 @@ Task("Test")
     .IsDependentOn("Build")
     .WithCriteria<BuildState>((c, state) => !state.SkipTests)
     .Does<BuildState>(state => {
-        var testSettings = new DotNetCoreTestSettings {
+        var testSettings = new DotNetTestSettings {
             Configuration = state.Configuration,
             NoBuild = true
         };
@@ -208,7 +207,7 @@ Task("Test")
             };
         }
 
-        DotNetCoreTest(state.SolutionName, testSettings);
+        DotNetTest(state.SolutionName, testSettings);
 
         if (testResultsPrefix != null) {
             foreach (var testResultsFile in GetFiles($"./**/TestResults/{testResultsPrefix}*.trx")) {
@@ -222,15 +221,15 @@ Task("Test")
 Task("Pack")
     .IsDependentOn("Test")
     .Does<BuildState>(state => {
-        var buildSettings = new DotNetCorePackSettings {
+        var buildSettings = new DotNetPackSettings {
             Configuration = state.Configuration,
             NoRestore = true,
             NoBuild = true,
-            MSBuildSettings = new DotNetCoreMSBuildSettings()
+            MSBuildSettings = new DotNetMSBuildSettings()
         };
 
         BuildUtilities.ApplyMSBuildProperties(buildSettings.MSBuildSettings, state);
-        DotNetCorePack(state.SolutionName, buildSettings);
+        DotNetPack(state.SolutionName, buildSettings);
     });
 
 
