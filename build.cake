@@ -41,7 +41,7 @@ const string VersionFile = "./build/version.json";
 //   The build counter. This is used when generating version numbers for the build.
 //
 // --build-metadata=<METADATA>
-//   Additional build metadata that will be included in the information version number generated 
+//   Additional build metadata that will be included in the informational version number generated 
 //   for compiled assemblies.
 //
 // --property=<PROPERTY>
@@ -51,7 +51,7 @@ const string VersionFile = "./build/version.json";
 // 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#load nuget:?package=Jaahas.Cake.Extensions&version=1.0.0
+#load nuget:?package=Jaahas.Cake.Extensions&version=1.1.0
 
 // Bootstrap build context and tasks.
 Bootstrap(DefaultSolutionFile, VersionFile);

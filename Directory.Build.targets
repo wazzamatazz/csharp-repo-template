@@ -21,9 +21,8 @@
   </PropertyGroup>
 
   <!-- SourceLink package reference -->
-  <ItemGroup Condition=" '$(DisableSourceLink)' != 'true' ">    
-    <PackageReference Remove="Microsoft.SourceLink.GitHub" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkGitHubVersion)">
+  <ItemGroup Condition=" '$(DisableSourceLink)' != 'true' "> 
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

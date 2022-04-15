@@ -27,12 +27,12 @@ The repository is organised as follows:
   - `build.sh` - Bash shell script to bootstrap and run the Cake script.
   - `Directory.Build.props` - Common MSBuild properties and targets (see [here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build) for details).
   - `Directory.Build.targets` - Common MSBuild properties and targets (see [here](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build) for details). 
+  - `Directory.Packages.props` - Common NuGet package versions (see [here](https://devblogs.microsoft.com/nuget/introducing-central-package-management/) for details). 
   - `LICENSE` - Licence details.
   - `README.md`
   - `RENAME-ME.sln` - Visual Studio solution file.
   - `[build]` - Resources for building the solution.
     - `Copyright.props` - Sets the copyright message for all projects in the solution.
-    - `Dependencies.props` - Common NuGet package versions.
     - `NetFX.targets` - Adds package references for building projects that target .NET Framework on non-Windows systems.
     - `version.json` - Defines version numbers used when building the projects.
   - `[samples]` - Example projects to demonstrate the usage of the repository libraries and applications.

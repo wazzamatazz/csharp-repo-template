@@ -16,22 +16,6 @@
     <CopyrightStartYear>{{COPYRIGHT_START_YEAR}}</CopyrightStartYear>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <!-- 
-    IMPORTANT: 
-    
-    This version will always be overridden by the version specified in build/version.json when 
-    building via build.ps1 or build.sh. It is defined here to allow Visual Studio to build the 
-    solution with the correct version number.
-    
-    You should ensure that you update this version number whenever you update build/version.json.
-    -->
-    <Version>0.1.0-alpha</Version>
-  </PropertyGroup>
-
-  <!-- Import common NuGet package versions. -->
-  <Import Project=".\build\Dependencies.props" Condition="Exists('.\build\Dependencies.props')" />
-
   <!-- Set copyright notice based on CopyrightStartYear property. -->
   <Import Project=".\build\Copyright.props" Condition="Exists('.\build\Copyright.props')" />
 
