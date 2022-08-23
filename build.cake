@@ -15,7 +15,7 @@ const string VersionFile = "./build/version.json";
 // --target=<TARGET>
 //   The Cake target to run. 
 //     Default: Test
-//     Possible Values: Clean, Restore, Build, Test, Pack
+//     Possible Values: Clean, Restore, Build, Test, Pack, BillOfMaterials
 //
 // --configuration=<CONFIGURATION>
 //   The MSBuild configuration to use. 
@@ -51,7 +51,7 @@ const string VersionFile = "./build/version.json";
 // 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#load nuget:?package=Jaahas.Cake.Extensions&version=1.2.0
+#load nuget:?package=Jaahas.Cake.Extensions&version=1.4.0
 
 // Bootstrap build context and tasks.
 Bootstrap(DefaultSolutionFile, VersionFile);
