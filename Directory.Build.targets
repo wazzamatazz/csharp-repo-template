@@ -13,20 +13,12 @@
   </PropertyGroup>
 
   <!-- SourceLink settings -->
-  <PropertyGroup Condition=" '$(DisableSourceLink)' != 'true' ">
+  <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-
-  <!-- SourceLink package reference -->
-  <ItemGroup Condition=" '$(DisableSourceLink)' != 'true' "> 
-    <PackageReference Include="Microsoft.SourceLink.GitHub">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
 
   <!-- .NET Framework targeting support (required to allow compilation against .NET Framework in 
        non-Windows environments). -->
