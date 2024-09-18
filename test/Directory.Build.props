@@ -9,8 +9,6 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <SignOutput>false</SignOutput>
-    <DeterministicSourcePaths>false</DeterministicSourcePaths>
-    <DisableSourceLink>true</DisableSourceLink>
   </PropertyGroup>
 
 </Project>
