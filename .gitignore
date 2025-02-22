@@ -333,3 +333,6 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+
+# MacOS desktop services
+.DS_Store
