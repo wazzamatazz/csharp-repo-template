@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/build/">
+    <File Path="build/version.json" />
+  </Folder>
+  <Folder Name="/common/">
+    <File Path=".gitignore" />
+    <File Path="build.cake" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/samples/" />
+  <Folder Name="/src/" />
+  <Folder Name="/test/" />
+</Solution>
