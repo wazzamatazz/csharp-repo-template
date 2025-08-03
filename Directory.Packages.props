@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
-    <PackageVersion Include="MSTest" Version="3.8.2" />
   </ItemGroup>
 
 </Project>
